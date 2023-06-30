@@ -6,6 +6,7 @@ class Generathor::Build::Command < Generathor::Build::Node
 
   def stmt
     <<~RUBY
+      #{build_eval_method}
       desc("#{command_sig}", "#{config["description"] || ""}")
       method_options(#{options})
       def #{function_sig}
@@ -23,6 +24,16 @@ class Generathor::Build::Command < Generathor::Build::Node
   end
 
   private
+
+  def build_eval_method
+    return unless config["eval"]
+
+    <<~RUBY
+      ::Cli::Command.define_method(:exec_#{command_name}) do 
+        #{config["eval"]}
+      end
+    RUBY
+  end
 
   def command_sig
     ([command_name] + arguments.map { |arg| arg.sub('?', '') }) * ' '
