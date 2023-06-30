@@ -69,7 +69,7 @@ class Generathor::Build
   def modules 
     @modules ||= begin
       Dir[@config.commands_glob].map do |file_path| 
-        config = JSON.parse(File.read(file_path))
+        config = customized_config(file_path)
 
         commands = config.delete("commands")
         modules = config.delete("modules")
@@ -83,6 +83,23 @@ class Generathor::Build
         end
       end.flatten
     end
+  end
+
+  def customized_config(file_path)
+    config = JSON.parse(File.read(file_path))
+    custo_path = file_path.gsub(/\.json$/, ".custo")
+
+    return config unless File.exist?(custo_path)
+
+    custo_config = JSON.parse(File.read(custo_path))
+
+    config["modules"].each do |mod_config|
+      if custo_config[mod_config["module_name"]]
+        mod_config.merge!(custo_config[mod_config["module_name"]])
+      end
+    end
+
+    config
   end
 end
 
