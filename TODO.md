@@ -1,0 +1,13 @@
+# TODO
+- Pouvoir spécifier le type de loading, ascendant ou descendant ou global: 
+  - global, valuer par défaut, les commandes doivent être chargé via le lib_path. 
+  - ascendant, un unique require au debut de la commande pour charger la classe
+  - descendant, un require par namespace, au debut des classes ou debut de la commande 
+- Ajouter un objet config au commande, plutôt que d'ecrire la config dans le main object
+- Pouvoir définir des commands aussi dans les config de module, faire un merge récusif avec les commandes globales
+- Pouvoir exclure ou inclure pour une commande un ou plusieurs modules, 
+- Renommer `Generathor::Struct` en `Generathor::ObjectProxy` ?
+- Renommer `lib_namespace` par `command_namespace`
+- Pouvoir merger les options et arguments des namespaces aux commands 
+- Ajouter des messages d'erreur plus verbeux
+- Revoir comment sont dfinit les arguments, passer un hash plutôt avec valeur par defaut ou si nulllable
