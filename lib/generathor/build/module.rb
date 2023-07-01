@@ -3,15 +3,15 @@
 class Generathor::Build::Module
 
   def initialize(
+    module_name:,
     module_config:,
     commands_config:,
     build_config: 
   )
+    @module_name = module_name
     @module_config = module_config
     @commands_config = commands_config
     @build_config = build_config
-
-    @module_name = module_config["module_name"]
   end
 
   def bin_stmt
@@ -44,7 +44,7 @@ class Generathor::Build::Module
   end
 
   def zsh_path
-    "#{@build_config.zsh_sources_path}/#{@module_name}"
+    "#{@build_config.bin_path}/#{@module_name}.zsh"
   end
 
   private

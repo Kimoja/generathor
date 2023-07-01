@@ -9,56 +9,32 @@ class Generathor::Build
   end
   
   def build
-    create_zsh_sources_dir
-    remove_zsh_sources_files
     remove_bin_files
     create_bin_files
-    create_zsh_files
-    add_zsh_sources
+    add_zsh_source
   end
   
   private
-
-  def create_zsh_sources_dir
-    FileUtils.mkdir_p(@config.zsh_sources_path)
-  end
   
-  def remove_zsh_sources_files
-    FileUtils.rm_rf("#{@config.zsh_sources_path}/.", secure: true)
-  end
-
   def remove_bin_files
     FileUtils.rm_rf("#{@config.bin_path}/.", secure: true)
   end
   
   def create_bin_files
-    modules.each do |mod|
-      File.write(mod.bin_path, mod.bin_stmt)
-      FileUtils.chmod(0755, mod.bin_path)
-    end
-  end
+    File.write(mod.bin_path, mod.bin_stmt)
+    FileUtils.chmod(0755, mod.bin_path)
 
-  def create_zsh_files
-    modules.each do |mod|
-      load mod.bin_path
-      
-      File.write(
-        mod.zsh_path,
-        mod.zsh_stmt
-      )
-    end
-  end
-
-  def add_zsh_sources
-    sources = modules.map do |mod|
-      "source #{mod.zsh_path}"
-    end
+    load mod.bin_path
     
-    sources_path = "#{@config.zsh_sources_path}/.sources"
-    File.write(sources_path, sources * "\n")
+    File.write(
+      mod.zsh_path,
+      mod.zsh_stmt
+    )
+  end
 
-    source = "source #{sources_path}"
-
+  def add_zsh_source
+    source = "source #{mod.zsh_path}"
+    
     return if File.open(@config.zshrc_path)
                   .each_line.any? { |line| line.include?(source) }
     
@@ -66,40 +42,30 @@ class Generathor::Build
     File.write(@config.zshrc_path, source, mode: 'a')
   end
 
-  def modules 
-    @modules ||= begin
-      Dir[@config.commands_glob].map do |file_path| 
-        config = customized_config(file_path)
+  def mod 
+    @mod ||= begin
+      mod = configured_module
 
-        commands = config.delete("commands")
-        modules = config.delete("modules")
-
-        modules.map do |module_config|
-          Generathor::Build::Module.new(
-            module_config: {}.merge(config).merge(module_config),
-            commands_config: commands,
-            build_config: @config
-          )
-        end
-      end.flatten
+      Generathor::Build::Module.new(
+        module_name: File.basename(@config.command_path, ".*" ),
+        module_config: mod["config"],
+        commands_config: mod["commands"],
+        build_config: @config
+      )
     end
   end
 
-  def customized_config(file_path)
-    config = JSON.parse(File.read(file_path))
-    custo_path = file_path.gsub(/\.json$/, ".custo")
+  def configured_module
+    mod = JSON.parse(File.read(@config.command_path))
+    config_path = @config.command_path.gsub(/\.json$/, ".config")
 
-    return config unless File.exist?(custo_path)
+    return mod unless File.exist?(config_path)
 
-    custo_config = JSON.parse(File.read(custo_path))
+    config = JSON.parse(File.read(config_path))
 
-    config["modules"].each do |mod_config|
-      if custo_config[mod_config["module_name"]]
-        mod_config.merge!(custo_config[mod_config["module_name"]])
-      end
-    end
+    mod["config"].merge!(config)
 
-    config
+    mod
   end
 end
 

@@ -2,22 +2,20 @@
 
 class Generathor::Build::Config
 
-  attr_reader :commands_glob, :lib_path, :lib_namespace, 
-             :bin_path, :zshrc_path, :zsh_sources_path
+  attr_reader :command_path, :lib_path, :lib_namespace, 
+             :bin_path, :zshrc_path
 
   def initialize(
-    commands_glob:, 
+    command_path:, 
     lib_path:,
     lib_namespace:,
     bin_path:,
-    zshrc_path:,
-    zsh_sources_path:
+    zshrc_path:
   )
-    @commands_glob = commands_glob
+    @command_path = command_path
     @lib_path = lib_path
     @lib_namespace = lib_namespace
     @bin_path = bin_path
     @zshrc_path = zshrc_path
-    @zsh_sources_path = zsh_sources_path
   end
 end
