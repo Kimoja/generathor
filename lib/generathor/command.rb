@@ -3,21 +3,7 @@
 class Generathor::Command
   class Arguments < Generathor::Struct; end
   class Options < Generathor::Struct; end
-
-  class Config < Generathor::Struct 
-    
-    def module_name
-      command_path_parts.first
-    end
-
-    def command_name
-      command_path_parts.last
-    end
-
-    def command_path_parts
-      @command_path_parts ||= command_path.split(" ")
-    end
-  end
+  class Config < Generathor::Struct; end
 
   def self.inherited(subclass)
     subclass.class_eval <<~RUBY 
