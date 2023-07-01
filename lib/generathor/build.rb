@@ -47,7 +47,6 @@ class Generathor::Build
       mod = configured_module
 
       Generathor::Build::Module.new(
-        module_name: File.basename(@config.command_path, ".*" ),
         module_config: mod["config"],
         commands_config: mod["commands"],
         build_config: @config

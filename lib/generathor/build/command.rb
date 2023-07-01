@@ -62,7 +62,7 @@ class Generathor::Build::Command < Generathor::Build::Node
     <<~RUBY
       #{parent.build_class_path}.config.dup.merge({
         command_name: '#{command_name}',
-        command_path: #{command_path.inspect}, 
+        command_path: '#{command_path}', 
       })
     RUBY
   end

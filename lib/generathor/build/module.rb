@@ -3,15 +3,15 @@
 class Generathor::Build::Module
 
   def initialize(
-    module_name:,
     module_config:,
     commands_config:,
-    build_config: 
+    build_config:
   )
-    @module_name = module_name
     @module_config = module_config
     @commands_config = commands_config
     @build_config = build_config
+
+    @command_name = @build_config.command_name
   end
 
   def bin_stmt
@@ -40,18 +40,18 @@ class Generathor::Build::Module
 
 
   def bin_path
-    "#{@build_config.bin_path}/#{@module_name}"
+    "#{@build_config.bin_path}/#{@command_name}"
   end
 
   def zsh_path
-    "#{@build_config.bin_path}/#{@module_name}.zsh"
+    "#{@build_config.bin_path}/#{@command_name}.zsh"
   end
 
   private
 
   def namespace
     @namespace ||= Generathor::Build::Namespace.new(
-      command_name: @module_name,
+      command_name: @command_name,
       parent: nil,
       config: @module_config.merge("lib_path" => @build_config.lib_path),
       commands_config: @commands_config,
@@ -63,19 +63,19 @@ class Generathor::Build::Module
     #BUNDLE_GEMFILE=./toolbox/Gemfile
     toolbox_path = File.expand_path("./")
     cmd_call = "BUNDLE_GEMFILE=#{toolbox_path}/Gemfile " \
-               "#{toolbox_path}/bin/#{@module_name} \"$@\"" 
+               "#{toolbox_path}/bin/#{@command_name} \"$@\"" 
     
     <<~BASH
-      #{@module_name}() {
+      #{@command_name}() {
         if #{zsh_proxy_command_condition}; then
-          echo "Evaluation of command: \"#{@module_name} $@\""
+          echo "Evaluation of command: \"#{@command_name} $@\""
           local cmd=$(#{cmd_call})
           eval $cmd
         else
           #{cmd_call}
         fi
       }
-      export "#{@module_name}"
+      export "#{@command_name}"
     BASH
   end
 
@@ -97,7 +97,7 @@ class Generathor::Build::Module
   def zsh_autocompletion_stmt
     Thor::ZshCompletion::Generator.new(
       Object.const_get(namespace.class_name), 
-      @module_name
+      @command_name
     ).generate
   end
 
